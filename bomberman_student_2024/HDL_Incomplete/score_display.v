@@ -47,9 +47,9 @@ assign score_next = enemy_hit_posedge & score_reg < 9980 ? score_reg + 10 : scor
 wire [3:0] bcd3, bcd2, bcd1, bcd0;
 
 // instantiate binary to bcd conversion circuit
-binary2bcd bcd_unit (.clk(clk), .reset(reset), .start(enemy_hit_posedge),
-                      .in(score_next), .bcd3(bcd3), .bcd2(bcd2), .bcd1(bcd1), .bcd0(bcd0),
-							 .count(), .state());
+//binary2bcd bcd_unit (.clk(clk), .reset(reset), .start(enemy_hit_posedge),
+//                      .in(score_next), .bcd3(bcd3), .bcd2(bcd2), .bcd1(bcd1), .bcd0(bcd0),
+//							 .count(), .state());
 
 // row and column regs to index numbers_rom
 reg [7:0] row;

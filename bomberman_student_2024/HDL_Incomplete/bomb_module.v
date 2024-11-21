@@ -1,3 +1,5 @@
+
+
 module bomb_module
 (
    input wire clk, reset,
@@ -78,7 +80,7 @@ always @(posedge clk, posedge reset)
 assign exp_counter_next = (exp_active_reg & exp_counter_reg < EXP_COUNTER_MAX) ? exp_counter_reg + 1 : 0;
 
 // infer registers used in FSM
-always @(posedge clk, posedge reset)
+always @(posedge clk, posedge reset) begin
    if(reset)
       begin
       bomb_exp_state_reg <= no_bomb;
@@ -99,11 +101,11 @@ always @(posedge clk, posedge reset)
       exp_block_addr_reg <= exp_block_addr_next;
       block_we_reg       <= block_we_next;
       end
-       
+end
        
 // FSM
-always @*
-   begin 
+always @ (posedge clk)  begin
+   if ( reset ) begin 
    // defaults
    bomb_exp_state_next = bomb_exp_state_reg;
    bomb_active_next    = bomb_active_reg;
@@ -113,15 +115,56 @@ always @*
    exp_block_addr_next = exp_block_addr_reg;
    block_we_next       = block_we_reg;
    post_exp_active     = 0;
-   
-	/*
-   case(bomb_exp_state_reg)
-   
-	// insert FSM 
-      
+   end else begin
+	
+   case (bomb_exp_state_next)
+
+      no_bomb  :   begin
+                    if (A && !gameover) begin
+                       bomb_active_next    <= 1'b1       ;
+                       bomb_x_next         <= x_bomb_a[9:4] ;
+                       bomb_y_next         <= y_bomb_a[9:4] ;
+                       bomb_exp_state_next <= bomb     ; 
+                    end
+                   end 
+      bomb     :   begin
+                    if ( bomb_counter_reg == BOMB_COUNTER_MAX) begin
+                       bomb_active_next    <= 1'b0    ; 
+                       exp_active_next     <= 1'b1    ; 
+                       block_we_next       <= 1'b1    ; 
+                       bomb_exp_state_next <= exp_1 ; 
+                    end
+                   end
+      exp_1    :   begin
+                    exp_block_addr_next <= bomb_x_next - 1'b1 + bomb_y_next*33 ; 
+                    bomb_exp_state_next <= exp_2                               ; 
+                   end 
+      exp_2    :   begin
+                    exp_block_addr_next <= bomb_x_next + 1'b1 + bomb_y_next*33 ; 
+                    bomb_exp_state_next <= exp_3                               ; 
+                   end
+      exp_3    :   begin
+                    exp_block_addr_next <= bomb_x_next + (bomb_y_next-1)*33    ; 
+                    bomb_exp_state_next <= exp_4                               ; 
+                   end
+      exp_4    :   begin
+                    exp_block_addr_next <= bomb_x_next + (bomb_y_next+1)*33    ; 
+                    bomb_exp_state_next <= post_exp                            ;
+                   end
+      post_exp :   begin
+                    post_exp_active <= 1'b1 ; 
+                    if ( exp_counter_next == EXP_COUNTER_MAX) begin
+                    bomb_exp_state_next <= no_bomb ;
+                    exp_active_next     <= 1'b0    ; 
+                    block_we_next       <= 1'b0    ; 
+                    end
+                   end
+      default  :   begin
+                   bomb_exp_state_next <= no_bomb ; 
+                   end
    endcase
-	*/
-   
+	
+   end
 end        // END FSM next-state logic 
 
 

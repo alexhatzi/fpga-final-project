@@ -44,6 +44,7 @@ wire display_on, pixel_tick;                      // route VGA signals
 wire [9:0] x, y;                                  // VGA x/y pixel location
 reg  [11:0] rgb_reg;                              // register to hold RGB signal values to route out
 wire [11:0] rgb_next;
+wire [2 :0] lives ; 
 
 wire [11:0] bomberman_rgb, pillar_rgb, block_rgb,
            bomb_rgb, exp_rgb, enemy_rgb,
@@ -98,39 +99,53 @@ bomberman_module bm_module(.clk(clk), .reset(reset), .x(x), .y(y), .L(L), .R(R),
                            .x_b(x_b), .y_b(y_b), .rgb_out(bomberman_rgb));
 
 
-/*
+
 block_module block_module_unit(.clk(clk), .reset(reset), .display_on(display_on),
                                .x(x), .y(y), .x_a(x_a), .y_a(y_a), .cd(current_dir_reg), .x_b(x_b),
                                .y_b(y_b), .waddr(block_w_addr), .we(block_we),
                                .rgb_out(block_rgb), .block_on(block_on), .bm_blocked(bm_blocked));
-*/
+
+ila_0 u_ilas (
+	.clk(clk), // input wire clk
+	.probe0(x), // input wire [9:0]  probe0  
+	.probe1(y), // input wire [9:0]  probe1
+   .probe2(vsync),
+   .probe3(hsync),
+   .probe4(display_on),
+   .probe5(pixel_tick),
+   .probe6(enemy_module_unit.x_e_reg),
+   .probe7(enemy_module_unit.y_e_reg),
+   .probe8(enemy_module_unit.move_cnt_reg),
+   .probe9(enemy_module_unit.motion_timer_reg),
+   .probe10(enemy_module_unit.e_state_reg)
+);
 
         
 
-/*
+
 bomb_module bomb_module_unit(.clk(clk), .reset(reset), .x_a(x_a), .y_a(y_a), .cd(current_dir_reg), 
                                .x_b(x_b), .y_b(y_b), .A(A), .gameover(gameover), .bomb_rgb(bomb_rgb),
                                .exp_rgb(exp_rgb), .bomb_on(bomb_on), .exp_on(exp_on), .block_w_addr(block_w_addr), 
                                .block_we(block_we), .post_exp_active(post_exp_active));
-*/
 
-/*                         
-enemy_module enemy_module_unit(.clk(clk), .reset(reset), .display_on(display_on),
+
+                       
+ enemy_module enemy_module_unit(.clk(clk), .reset(reset), .display_on(display_on),
                                .x(x), .y(y), .x_b(x_b), .y_b(y_b),
                                .exp_on(exp_on), .post_exp_active(post_exp_active), .rgb_out(enemy_rgb),
                                .enemy_on(enemy_on), .enemy_hit(enemy_hit));      
-*/
 
 
-/*                             
+
+                           
 game_lives game_lives_unit(.clk(clk), .reset(reset), .x(x), .y(y), .bm_hb_on(bm_hb_on),
                            .enemy_on(enemy_on), .exp_on(exp_on), .gameover(gameover),
-                           .background_rgb(background_rgb));
-*/
+                           .background_rgb(background_rgb), .lives_next(lives));
 
-/*
+
+
 score_display score_display_unit(.clk(clk), .reset(reset), .x(x), .y(y), .enemy_hit(enemy_hit), .score_on(score_on));
-*/
+
 
 // infer register for RGB color data signal
 always @(posedge clk, posedge reset)
@@ -152,8 +167,9 @@ assign rgb_next = pixel_tick?
                   12'b001000100000 : rgb_reg;
 
 // assign rgb output of top module
-assign rgb = (display_on) ? rgb_reg : 8'h00;
-                
+ assign rgb = (display_on) ? rgb_reg : 8'h00;
+
+
 // instantiate vga synchronization circuit 
 vga_sync vga_sync_unit (.clk(clk), .reset(reset), .hsync(hsync), .vsync(vsync), .display_on(display_on), .p_tick(pixel_tick), .x(x), .y(y));
 

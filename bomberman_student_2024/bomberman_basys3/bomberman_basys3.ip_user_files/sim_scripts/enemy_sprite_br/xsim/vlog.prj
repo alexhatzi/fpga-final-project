@@ -1,0 +1,7 @@
+verilog xil_defaultlib  \
+"../../../../bomberman_basys3.gen/sources_1/ip/enemy_sprite_br/sim/enemy_sprite_br.v" \
+
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

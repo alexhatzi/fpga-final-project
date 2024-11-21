@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<ProcessHandle Version="1" Minor="0">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="13865" HostCore="16" HostMemory="15704924">
+    </Process>
+</ProcessHandle>
+<?xml version="1.0"?>
+<ProcessHandle Version="1" Minor="0">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="75991" HostCore="16" HostMemory="15704924">
+    </Process>
+</ProcessHandle>
+<?xml version="1.0"?>
+<ProcessHandle Version="1" Minor="0">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="130511" HostCore="16" HostMemory="15704924">
+    </Process>
+</ProcessHandle>
+<?xml version="1.0"?>
+<ProcessHandle Version="1" Minor="0">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="184508" HostCore="16" HostMemory="15704924">
+    </Process>
+</ProcessHandle>
+<?xml version="1.0"?>
+<ProcessHandle Version="1" Minor="0">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="240375" HostCore="16" HostMemory="15704924">
+    </Process>
+</ProcessHandle>

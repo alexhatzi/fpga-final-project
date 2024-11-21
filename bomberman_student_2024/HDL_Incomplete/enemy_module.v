@@ -39,6 +39,16 @@ localparam D_2 = 168;
 localparam D_3 = 192;
 localparam exp = 216;
 
+
+localparam BM_HB_OFFSET_9 = 8;                  // offset from top of sprite down to top of 16x16 hit box              
+localparam BM_WIDTH       = 16;                 // sprite width
+localparam BM_HEIGHT      = 24;                 // sprite height
+
+localparam UP_LEFT_X   = 48;                    // constraints of Bomberman sprite location (upper left corner) within arena.
+localparam UP_LEFT_Y   = 32;
+localparam LOW_RIGHT_X = 576 - BM_WIDTH + 1;
+localparam LOW_RIGHT_Y = 448 - BM_HB_OFFSET_9;           
+
 localparam TIMER_MAX = 4000000;                          // max value for motion_timer_reg
 
 localparam ENEMY_X_INIT = X_WALL_L + 10*ENEMY_WH;        // enemy initial value
@@ -86,8 +96,53 @@ always @(posedge clk, posedge reset)
         move_cnt_reg         <= move_cnt_next;
         end
  
-// FSM next-state logic
-always @*
+
+
+//************************************************************** PILLAR COLLISION SIGNALS *************************************************************
+
+// pillar collision signals, asserted when sprite hit box will collide with 
+// left, right, top, bottom side of pillar if sprite hitbox where to 
+// move in that direction.
+wire p_c_up, p_c_down, p_c_left, p_c_right;
+
+// determine p_c_down & p_c_up signals:
+
+wire [9:0] x_e_hit_l, x_e_hit_r, y_e_bottom, y_e_top;
+assign x_e_hit_l  = x_e_reg - UP_LEFT_X;                        // x coordinate of left  edge of hitbox
+assign x_e_hit_r  = x_e_reg - UP_LEFT_X + BM_WIDTH - 1;         // x coordinate of right edge of hitbox
+assign y_e_bottom = y_e_reg - UP_LEFT_Y + BM_HEIGHT + 1;        // y coordiante of bottom of hitbox if sprite were going to move down (y + 1)
+assign y_e_top    = y_e_reg - UP_LEFT_Y + BM_HB_OFFSET_9 - 1;   // y coordinate of top of hitbox if sprite were going to move up (y - 1)
+
+
+// sprite will collide if going down if the bottom of the hitbox would be within a pillar (5th bit == 1), 
+// and either the left or right edges of the hit box are within the x coordinates of a pillar (5th bit == 1)
+assign p_c_down = ((y_e_bottom[4] == 1) & (x_e_hit_l[4] == 1 | x_e_hit_r[4] == 1));   
+
+// sprite will collide if going up if the top of the hitbox would be within a pillar (5th bit == 1), 
+// and either the left or right edges of the hit box are within the x coordinates of a pillar (5th bit == 1)
+assign p_c_up   = ((   y_e_top[4] == 1) & (x_e_hit_l[4] == 1 | x_e_hit_r[4] == 1));
+
+// determine p_c_left & p_c_right signals:
+
+wire [9:0] y_e_hit_t, y_e_hit_b, x_e_left, x_e_right;
+assign y_e_hit_t = y_e_reg - UP_LEFT_Y + BM_HB_OFFSET_9; // y coordinate of the top edge of the hitbox
+assign y_e_hit_b = y_e_reg - UP_LEFT_Y + BM_HEIGHT -1;   // y coordiate of the bottom edge of the hitbox
+assign x_e_left  = x_e_reg - UP_LEFT_X - 1;              // x coordinate of the left edge of the hitbox if the sprite were going to move left (x - 1)
+assign x_e_right = x_e_reg - UP_LEFT_X + BM_WIDTH + 1;   // x coordinate of the right edge of the hitbox if the sprite were going to move right (x + 1)
+
+
+// sprite will collide if going left if the left edge of the hitbox would be within a pillar (5th bit == 1), 
+// and either the top or bottom edges of the hit box are within the x coordinates of a pillar (5th bit == 1)
+assign p_c_left  = ( (x_e_left[4] == 1) & (y_e_hit_t[4] == 1 | y_e_hit_b[4] == 1)) ? 1 : 0;
+
+// sprite will collide if going right if the right edge of the hitbox would be within a pillar (5th bit == 1), 
+// and either the top or bottom edges of the hit box are within the x coordinates of a pillar (5th bit == 1)
+assign p_c_right = ((x_e_right[4] == 1) & (y_e_hit_t[4] == 1 | y_e_hit_b[4] == 1)) ? 1 : 0;
+
+
+
+///////////////////////////////////////// FSM next-state logic //////////////////////////////////////////
+always @* 
    begin 
    // defaults
    e_state_next          = e_state_reg;
@@ -99,13 +154,76 @@ always @*
    move_cnt_next         = move_cnt_reg;  
 	enemy_hit             = 0;
    
-/*
+//                                                               idle            = 3'b000,  
+//                                                               move_btwn_tiles = 3'b001,  
+//                                                               get_rand_dir    = 3'b010,  
+//                                                               check_dir       = 3'b011,  
+//                                                               exp_enemy       = 3'b100;  
    case(e_state_reg)
-   
-	// insert FSM
-	
+            idle  :  begin
+                     if (exp_on && enemy_on)  begin
+                     motion_timer_next <= 22'd0 ; 
+                     enemy_hit <= 1'b1 ; 
+                     e_state_next <= exp_enemy ; 
+                     end else begin
+                        if ( motion_timer_reg == motion_timer_max_reg)  begin
+                              if (move_cnt_reg < 15 ) begin
+                                 move_cnt_next <= move_cnt_reg + 1'b1 ; 
+                                 e_state_next  <= move_btwn_tiles ; 
+                              end else  begin
+                              move_cnt_next <= 0 ; 
+                              e_state_next  <= get_rand_dir ; 
+                              end
+                        end 
+                           motion_timer_next <= motion_timer_reg + 1 ; 
+
+                     end
+                     end
+
+  move_btwn_tiles :  begin
+                     if ((e_cd_reg == CD_U) && !p_c_up) begin
+                        y_e_next <= y_e_reg + 1 ; 
+                     end else if ((e_cd_reg == CD_D)  && !p_c_down ) begin
+                        y_e_next <= y_e_reg - 1 ;
+                     end else if ((e_cd_reg == CD_L)  && !p_c_left)  begin
+                        x_e_next <= x_e_reg - 1 ; 
+                     end else if (( e_cd_reg == CD_R) && !p_c_right) begin
+                        x_e_next <= x_e_reg + 1 ; 
+                     end
+                     e_state_next <= idle ; 
+                     end
+
+     get_rand_dir :  begin
+                     if (random_16[4:2] == 2'b00) begin
+                        e_cd_next <= random_16[1:0] ; 
+                     end
+                     e_state_next <= check_dir ; 
+                     end
+
+      check_dir    : begin
+                     if ((e_cd_reg == CD_U) && !p_c_up ) begin
+                        e_state_next <= move_btwn_tiles ; 
+                     end else if ((e_cd_reg == CD_D) && !p_c_down) begin
+                        e_state_next <= move_btwn_tiles ;
+                     end else if ((e_cd_reg == CD_L) && !p_c_left) begin
+                        e_state_next <= move_btwn_tiles ; 
+                     end else if ((e_cd_reg == CD_R) && !p_c_right) begin
+                        e_state_next <= move_btwn_tiles ; 
+                     end else begin
+                        e_state_next <= get_rand_dir ; 
+                     end
+                     end
+
+        exp_enemy :  begin
+                     if (!post_exp_active) begin
+                        motion_timer_next <= 0 ; 
+                        motion_timer_max_next <= motion_timer_max_next - 1 ; 
+                        enemy_hit <= 0 ; 
+                        e_state_next <= idle ; 
+                     end
+                     end
    endcase
-	*/
+	
 end         
                         
 // assign output telling top_module when to display bomberman's sprite on screen
