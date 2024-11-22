@@ -164,7 +164,7 @@ wire [9:0] y_b_hit_t_m1 = y_b_hit_t - 1;
 wire [9:0] y_b_hit_b_p1 = y_b_hit_b + 1;
 
 // next state logic for bomberman location
-assign x_b_next = (!gameover & !bm_blocked & motion_timer_tick) ?
+assign x_b_next = (!gameover  & !bm_blocked & motion_timer_tick) ?
                   (cd == CD_R & ~p_c_right & x_b < LOW_RIGHT_X) |                  // can move right into a clear row
                   (cd == CD_U & p_c_up     & x_b_hit_l_m1[4] == 1) |               // moving up into top right of pillar, go right and around
                   (cd == CD_D & p_c_down   & x_b_hit_l_m1[4] == 1)? x_b_reg + 1:   // moving down into bottom right of pillar, go right and around

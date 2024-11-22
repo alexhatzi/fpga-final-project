@@ -49,10 +49,10 @@ localparam UP_LEFT_Y   = 32;
 localparam LOW_RIGHT_X = 576 - BM_WIDTH + 1;
 localparam LOW_RIGHT_Y = 448 - BM_HB_OFFSET_9;           
 
-localparam TIMER_MAX = 4000000;                          // max value for motion_timer_reg
+localparam TIMER_MAX = 40000000;                          // max value for motion_timer_reg
 
 localparam ENEMY_X_INIT = X_WALL_L + 10*ENEMY_WH;        // enemy initial value
-localparam ENEMY_Y_INIT = Y_WALL_U + 10*ENEMY_H;        
+localparam ENEMY_Y_INIT = Y_WALL_U + 10*ENEMY_H - 8;        
 
 
 reg [7:0] rom_offset_reg, rom_offset_next;               // register to hold y index offset into bomberman sprite ROM
@@ -71,7 +71,8 @@ wire [5:0] y_e_abm = y_e_a[9:4];
 wire [15:0] random_16;                                   // output from LFSR module
 
 // infer LFSR module, used to get pseudorandom direction for enemy and pseudorandom chance of getting new direction
-LFSR_16 LFSR_16_unit(.clk(clk), .rst(reset), .w_en(), .w_in(), .out(random_16));
+LFSR_16 LFSR_16_unit  (.clk(clk), .rst(reset), .w_en(1'b1), .w_in(16'hC2E0), .out(random_16));
+
 
 // infer registers for FSM
 always @(posedge clk, posedge reset)
@@ -139,6 +140,13 @@ assign p_c_left  = ( (x_e_left[4] == 1) & (y_e_hit_t[4] == 1 | y_e_hit_b[4] == 1
 // and either the top or bottom edges of the hit box are within the x coordinates of a pillar (5th bit == 1)
 assign p_c_right = ((x_e_right[4] == 1) & (y_e_hit_t[4] == 1 | y_e_hit_b[4] == 1)) ? 1 : 0;
 
+// offset values used to avoid corner case where bomberman walks into block when going around a pillar
+// to witness corner cases, use original values in two assignments below.
+wire [9:0] x_e_hit_l_m1 = x_e_hit_l - 1;   
+wire [9:0] x_e_hit_r_p1 = x_e_hit_r + 1;
+wire [9:0] y_e_hit_t_m1 = y_e_hit_t - 1;
+wire [9:0] y_e_hit_b_p1 = y_e_hit_b + 1;
+
 
 
 ///////////////////////////////////////// FSM next-state logic //////////////////////////////////////////
@@ -154,11 +162,6 @@ always @*
    move_cnt_next         = move_cnt_reg;  
 	enemy_hit             = 0;
    
-//                                                               idle            = 3'b000,  
-//                                                               move_btwn_tiles = 3'b001,  
-//                                                               get_rand_dir    = 3'b010,  
-//                                                               check_dir       = 3'b011,  
-//                                                               exp_enemy       = 3'b100;  
    case(e_state_reg)
             idle  :  begin
                      if (exp_on && enemy_on)  begin
@@ -168,11 +171,11 @@ always @*
                      end else begin
                         if ( motion_timer_reg == motion_timer_max_reg)  begin
                               if (move_cnt_reg < 15 ) begin
-                                 move_cnt_next <= move_cnt_reg + 1'b1 ; 
-                                 e_state_next  <= move_btwn_tiles ; 
+                                 move_cnt_next  <= move_cnt_reg + 1'b1 ; 
+                                 e_state_next   <= move_btwn_tiles ; 
                               end else  begin
-                              move_cnt_next <= 0 ; 
-                              e_state_next  <= get_rand_dir ; 
+                              move_cnt_next  <= 0 ; 
+                              e_state_next   <= get_rand_dir ; 
                               end
                         end 
                            motion_timer_next <= motion_timer_reg + 1 ; 
@@ -181,13 +184,13 @@ always @*
                      end
 
   move_btwn_tiles :  begin
-                     if ((e_cd_reg == CD_U) && !p_c_up) begin
+                     if (e_cd_reg == CD_U)           begin
                         y_e_next <= y_e_reg + 1 ; 
-                     end else if ((e_cd_reg == CD_D)  && !p_c_down ) begin
+                     end else if (e_cd_reg == CD_D)  begin
                         y_e_next <= y_e_reg - 1 ;
-                     end else if ((e_cd_reg == CD_L)  && !p_c_left)  begin
+                     end else if (e_cd_reg == CD_L)  begin
                         x_e_next <= x_e_reg - 1 ; 
-                     end else if (( e_cd_reg == CD_R) && !p_c_right) begin
+                     end else if (e_cd_reg == CD_R ) begin
                         x_e_next <= x_e_reg + 1 ; 
                      end
                      e_state_next <= idle ; 
@@ -196,21 +199,21 @@ always @*
      get_rand_dir :  begin
                      if (random_16[4:2] == 2'b00) begin
                         e_cd_next <= random_16[1:0] ; 
+                        e_state_next <= check_dir ; 
                      end
-                     e_state_next <= check_dir ; 
                      end
 
-      check_dir    : begin
-                     if ((e_cd_reg == CD_U) && !p_c_up ) begin
+      check_dir   :  begin
+                     if ((e_cd_reg == CD_U)           && (y_e_abm > 0 ) &&  !(x_e_abm[0])) begin
                         e_state_next <= move_btwn_tiles ; 
-                     end else if ((e_cd_reg == CD_D) && !p_c_down) begin
+                     end else if ((e_cd_reg == CD_D)  && (y_e_abm < 26   ) &&  !(x_e_abm[0])) begin
                         e_state_next <= move_btwn_tiles ;
-                     end else if ((e_cd_reg == CD_L) && !p_c_left) begin
+                     end else if ((e_cd_reg == CD_L)  && (x_e_abm > 0   ) &&   (y_e_abm[0])) begin
                         e_state_next <= move_btwn_tiles ; 
-                     end else if ((e_cd_reg == CD_R) && !p_c_right) begin
+                     end else if ((e_cd_reg == CD_R)  && (x_e_abm < 32  ) &&   (y_e_abm[0])) begin
                         e_state_next <= move_btwn_tiles ; 
                      end else begin
-                        e_state_next <= get_rand_dir ; 
+                        e_state_next <= get_rand_dir    ; 
                      end
                      end
 

@@ -2,7 +2,7 @@
 // Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2024.1 (lin64) Build 5076996 Wed May 22 18:36:09 MDT 2024
-// Date        : Thu Nov 21 09:12:42 2024
+// Date        : Thu Nov 21 22:14:07 2024
 // Host        : Samsung-SmartFridge running 64-bit Ubuntu 22.04.5 LTS
 // Command     : write_verilog -force -mode synth_stub
 //               /media/alex/secondaryLinux/FPGALAB/fpga-final-project/bomberman_student_2024/bomberman_basys3/bomberman_basys3.gen/sources_1/ip/ila_0/ila_0_stub.v
@@ -16,8 +16,8 @@
 // Please paste the declaration into a Verilog source file or add the file as an additional source.
 (* X_CORE_INFO = "ila,Vivado 2024.1" *)
 module ila_0(clk, probe0, probe1, probe2, probe3, probe4, probe5, 
-  probe6, probe7, probe8, probe9, probe10)
-/* synthesis syn_black_box black_box_pad_pin="probe0[9:0],probe1[9:0],probe2[0:0],probe3[0:0],probe4[0:0],probe5[0:0],probe6[9:0],probe7[9:0],probe8[11:0],probe9[20:0],probe10[20:0]" */
+  probe6, probe7, probe8, probe9, probe10, probe11, probe12, probe13)
+/* synthesis syn_black_box black_box_pad_pin="probe0[9:0],probe1[9:0],probe2[0:0],probe3[0:0],probe4[0:0],probe5[0:0],probe6[9:0],probe7[9:0],probe8[11:0],probe9[21:0],probe10[21:0],probe11[15:0],probe12[15:0],probe13[15:0]" */
 /* synthesis syn_force_seq_prim="clk" */;
   input clk /* synthesis syn_isclock = 1 */;
   input [9:0]probe0;
@@ -29,6 +29,9 @@ module ila_0(clk, probe0, probe1, probe2, probe3, probe4, probe5,
   input [9:0]probe6;
   input [9:0]probe7;
   input [11:0]probe8;
-  input [20:0]probe9;
-  input [20:0]probe10;
+  input [21:0]probe9;
+  input [21:0]probe10;
+  input [15:0]probe11;
+  input [15:0]probe12;
+  input [15:0]probe13;
 endmodule

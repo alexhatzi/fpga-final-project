@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenRun Id="enemy_sprite_br_synth_1" LaunchPart="xc7a35tcpg236-1" LaunchTime="1732210202">
-  <File Type="VDS-TIMING-PB" Name="enemy_sprite_br_timing_summary_synth.pb"/>
-  <File Type="VDS-TIMINGSUMMARY" Name="enemy_sprite_br_timing_summary_synth.rpt"/>
   <File Type="RDS-RDS" Name="enemy_sprite_br.vds"/>
   <File Type="REPORTS-TCL" Name="enemy_sprite_br_reports.tcl"/>
   <File Type="PA-TCL" Name="enemy_sprite_br.tcl"/>
   <File Type="RDS-DCP" Name="enemy_sprite_br.dcp"/>
-  <File Type="RDS-PROPCONSTRS" Name="enemy_sprite_br_drc_synth.rpt"/>
   <File Type="RDS-UTIL" Name="enemy_sprite_br_utilization_synth.rpt"/>
   <File Type="RDS-UTIL-PB" Name="enemy_sprite_br_utilization_synth.pb"/>
   <FileSet Name="sources" Type="BlockSrcs" RelSrcDir="$PSRCDIR/enemy_sprite_br" RelGenDir="$PGENDIR/enemy_sprite_br">
@@ -50,9 +47,7 @@
     </Config>
   </FileSet>
   <Strategy Version="1" Minor="2">
-    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2024">
-      <Desc>Vivado Synthesis Defaults</Desc>
-    </StratHandle>
+    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2024"/>
     <Step Id="synth_design"/>
   </Strategy>
 </GenRun>

@@ -109,15 +109,18 @@ ila_0 u_ilas (
 	.clk(clk), // input wire clk
 	.probe0(x), // input wire [9:0]  probe0  
 	.probe1(y), // input wire [9:0]  probe1
-   .probe2(vsync),
-   .probe3(hsync),
-   .probe4(display_on),
-   .probe5(pixel_tick),
-   .probe6(enemy_module_unit.x_e_reg),
-   .probe7(enemy_module_unit.y_e_reg),
+   .probe2(enemy_module_unit.p_c_down),
+   .probe3(enemy_module_unit.p_c_up),
+   .probe4(enemy_module_unit.LFSR_16_unit.w_en),
+   .probe5(enemy_module_unit.p_c_left),
+   .probe6(enemy_module_unit.e_cd_reg),
+   .probe7(enemy_module_unit.p_c_right),
    .probe8(enemy_module_unit.move_cnt_reg),
    .probe9(enemy_module_unit.motion_timer_reg),
-   .probe10(enemy_module_unit.e_state_reg)
+   .probe10(enemy_module_unit.e_state_reg),
+   .probe11(enemy_module_unit.random_16),
+   .probe12(enemy_module_unit.random_16),
+   .probe13(enemy_module_unit.LFSR_16_unit.data)
 );
 
         

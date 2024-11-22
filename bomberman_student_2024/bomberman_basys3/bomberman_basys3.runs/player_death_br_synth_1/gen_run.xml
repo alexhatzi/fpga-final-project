@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenRun Id="player_death_br_synth_1" LaunchPart="xc7a35tcpg236-1" LaunchTime="1732210202">
-  <File Type="VDS-TIMING-PB" Name="player_death_br_timing_summary_synth.pb"/>
-  <File Type="VDS-TIMINGSUMMARY" Name="player_death_br_timing_summary_synth.rpt"/>
-  <File Type="RDS-DCP" Name="player_death_br.dcp"/>
-  <File Type="RDS-UTIL-PB" Name="player_death_br_utilization_synth.pb"/>
-  <File Type="RDS-UTIL" Name="player_death_br_utilization_synth.rpt"/>
-  <File Type="RDS-PROPCONSTRS" Name="player_death_br_drc_synth.rpt"/>
   <File Type="RDS-RDS" Name="player_death_br.vds"/>
   <File Type="REPORTS-TCL" Name="player_death_br_reports.tcl"/>
   <File Type="PA-TCL" Name="player_death_br.tcl"/>
+  <File Type="RDS-DCP" Name="player_death_br.dcp"/>
+  <File Type="RDS-UTIL" Name="player_death_br_utilization_synth.rpt"/>
+  <File Type="RDS-UTIL-PB" Name="player_death_br_utilization_synth.pb"/>
   <FileSet Name="sources" Type="BlockSrcs" RelSrcDir="$PSRCDIR/player_death_br" RelGenDir="$PGENDIR/player_death_br">
     <File Path="$PSRCDIR/sources_1/ip/player_death_br/player_death_br.xci">
       <FileInfo>
