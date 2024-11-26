@@ -97,6 +97,11 @@ proc step_failed { step } {
 OPTRACE "impl_1" END { }
 }
 
+set_msg_config -id {Common 17-41} -limit 10000000
+set_msg_config -id {Synth 8-256} -limit 10000
+set_msg_config -id {Synth 8-638} -limit 10000
+set_msg_config  -id {Synth 8-4442}  -string {{CRITICAL WARNING: [Synth 8-4442] BlackBox module u_ilas has unconnected pin probe5[0]}}  -suppress 
+set_msg_config  -id {Synth 8-4442}  -suppress 
 
 OPTRACE "impl_1" START { ROLLUP_1 }
 OPTRACE "Phase: Init Design" START { ROLLUP_AUTO }
@@ -104,9 +109,10 @@ start_step init_design
 set ACTIVE_STEP init_design
 set rc [catch {
   create_msg_db init_design.pb
-  set_param tcl.collectionResultDisplayLimit 0
+  set_param checkpoint.writeSynthRtdsInDcp 1
   set_param chipscope.maxJobs 4
   set_param xicom.use_bs_reader 1
+  set_param synth.incrementalSynthesisCache ./.Xil/Vivado-28049-Samsung-SmartFridge/incrSyn
   set_param runs.launchOptions { -jobs 8  }
 OPTRACE "create in-memory project" START { }
   create_project -in_memory -part xc7a35tcpg236-1
@@ -118,7 +124,7 @@ OPTRACE "set parameters" START { }
   set_property parent.project_path /media/alex/secondaryLinux/FPGALAB/fpga-final-project/bomberman_student_2024/bomberman_basys3/bomberman_basys3.xpr [current_project]
   set_property ip_output_repo /media/alex/secondaryLinux/FPGALAB/fpga-final-project/bomberman_student_2024/bomberman_basys3/bomberman_basys3.cache/ip [current_project]
   set_property ip_cache_permissions {read write} [current_project]
-  set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY} [current_project]
+  set_property XPM_LIBRARIES XPM_MEMORY [current_project]
 OPTRACE "set parameters" END { }
 OPTRACE "add files" START { }
   add_files -quiet /media/alex/secondaryLinux/FPGALAB/fpga-final-project/bomberman_student_2024/bomberman_basys3/bomberman_basys3.runs/synth_1/top_module.dcp
@@ -129,7 +135,6 @@ OPTRACE "add files" START { }
   read_ip -quiet /media/alex/secondaryLinux/FPGALAB/fpga-final-project/bomberman_student_2024/bomberman_basys3/bomberman_basys3.srcs/sources_1/ip/pillar_dm/pillar_dm.xci
   read_ip -quiet /media/alex/secondaryLinux/FPGALAB/fpga-final-project/bomberman_student_2024/bomberman_basys3/bomberman_basys3.srcs/sources_1/ip/block_dm/block_dm.xci
   read_ip -quiet /media/alex/secondaryLinux/FPGALAB/fpga-final-project/bomberman_student_2024/bomberman_basys3/bomberman_basys3.srcs/sources_1/ip/block_map_1/block_map.xci
-  read_ip -quiet /media/alex/secondaryLinux/FPGALAB/fpga-final-project/bomberman_student_2024/bomberman_basys3/bomberman_basys3.srcs/sources_1/ip/ila_0/ila_0.xci
   read_ip -quiet /media/alex/secondaryLinux/FPGALAB/fpga-final-project/bomberman_student_2024/bomberman_basys3/bomberman_basys3.srcs/sources_1/ip/enemy_sprite_br/enemy_sprite_br.xci
 OPTRACE "read constraints: implementation" START { }
   read_xdc /media/alex/secondaryLinux/FPGALAB/fpga-final-project/bomberman_student_2024/HDL_Incomplete/basys3.xdc
@@ -296,7 +301,7 @@ set rc [catch {
   create_msg_db write_bitstream.pb
 OPTRACE "read constraints: write_bitstream" START { }
 OPTRACE "read constraints: write_bitstream" END { }
-  set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY} [current_project]
+  set_property XPM_LIBRARIES XPM_MEMORY [current_project]
   catch { write_mem_info -force -no_partial_mmi top_module.mmi }
 OPTRACE "write_bitstream setup" END { }
 OPTRACE "write_bitstream" START { }

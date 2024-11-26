@@ -49,7 +49,7 @@ localparam UP_LEFT_Y   = 32;
 localparam LOW_RIGHT_X = 576 - BM_WIDTH + 1;
 localparam LOW_RIGHT_Y = 448 - BM_HB_OFFSET_9;           
 
-localparam TIMER_MAX = 40000000;                          // max value for motion_timer_reg
+localparam TIMER_MAX = 400000000;                          // max value for motion_timer_reg
 
 localparam ENEMY_X_INIT = X_WALL_L + 10*ENEMY_WH;        // enemy initial value
 localparam ENEMY_Y_INIT = Y_WALL_U + 10*ENEMY_H - 8;        
@@ -225,6 +225,7 @@ always @*
                         e_state_next <= idle ; 
                      end
                      end
+        default : e_state_next <= idle ; 
    endcase
 	
 end         

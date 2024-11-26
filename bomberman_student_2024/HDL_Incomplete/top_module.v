@@ -11,9 +11,8 @@ module top_module
 
 // synchronize asynchronous reset
 reg reset;
-always@(posedge clk) begin
+always@(posedge clk)
    reset <= rst;
-end
 
 // debounce pushbutton inputs to debounced signals U - A
 wire U, D, L, R, A;
@@ -44,7 +43,6 @@ wire display_on, pixel_tick;                      // route VGA signals
 wire [9:0] x, y;                                  // VGA x/y pixel location
 reg  [11:0] rgb_reg;                              // register to hold RGB signal values to route out
 wire [11:0] rgb_next;
-wire [2 :0] lives ; 
 
 wire [11:0] bomberman_rgb, pillar_rgb, block_rgb,
            bomb_rgb, exp_rgb, enemy_rgb,
@@ -93,7 +91,7 @@ assign wall_on = ((x < LEFT_WALL) | ( x > RIGHT_WALL) | (y < TOP_WALL) | (y > BO
 
 pillar_display pillar_disp_unit(.x(x), .y(y), .x_a(x_a), .y_a(y_a), .pillar_on(pillar_on), .rgb_out(pillar_rgb));
 
-                         
+                        
 bomberman_module bm_module(.clk(clk), .reset(reset), .x(x), .y(y), .L(L), .R(R), .U(U), .D(D), .cd(current_dir_reg), .bm_blocked(bm_blocked),
                            .gameover(gameover), .bomberman_on(bomberman_on), .bm_hb_on(bm_hb_on),
                            .x_b(x_b), .y_b(y_b), .rgb_out(bomberman_rgb));
@@ -104,26 +102,7 @@ block_module block_module_unit(.clk(clk), .reset(reset), .display_on(display_on)
                                .x(x), .y(y), .x_a(x_a), .y_a(y_a), .cd(current_dir_reg), .x_b(x_b),
                                .y_b(y_b), .waddr(block_w_addr), .we(block_we),
                                .rgb_out(block_rgb), .block_on(block_on), .bm_blocked(bm_blocked));
-
-ila_0 u_ilas (
-	.clk(clk), // input wire clk
-	.probe0(x), // input wire [9:0]  probe0  
-	.probe1(y), // input wire [9:0]  probe1
-   .probe2(enemy_module_unit.p_c_down),
-   .probe3(enemy_module_unit.p_c_up),
-   .probe4(enemy_module_unit.LFSR_16_unit.w_en),
-   .probe5(enemy_module_unit.p_c_left),
-   .probe6(enemy_module_unit.e_cd_reg),
-   .probe7(enemy_module_unit.p_c_right),
-   .probe8(enemy_module_unit.move_cnt_reg),
-   .probe9(enemy_module_unit.motion_timer_reg),
-   .probe10(enemy_module_unit.e_state_reg),
-   .probe11(enemy_module_unit.random_16),
-   .probe12(enemy_module_unit.random_16),
-   .probe13(enemy_module_unit.LFSR_16_unit.data)
-);
-
-        
+     
 
 
 bomb_module bomb_module_unit(.clk(clk), .reset(reset), .x_a(x_a), .y_a(y_a), .cd(current_dir_reg), 
@@ -132,8 +111,8 @@ bomb_module bomb_module_unit(.clk(clk), .reset(reset), .x_a(x_a), .y_a(y_a), .cd
                                .block_we(block_we), .post_exp_active(post_exp_active));
 
 
-                       
- enemy_module enemy_module_unit(.clk(clk), .reset(reset), .display_on(display_on),
+                         
+enemy_module enemy_module_unit(.clk(clk), .reset(reset), .display_on(display_on),
                                .x(x), .y(y), .x_b(x_b), .y_b(y_b),
                                .exp_on(exp_on), .post_exp_active(post_exp_active), .rgb_out(enemy_rgb),
                                .enemy_on(enemy_on), .enemy_hit(enemy_hit));      
@@ -143,7 +122,7 @@ bomb_module bomb_module_unit(.clk(clk), .reset(reset), .x_a(x_a), .y_a(y_a), .cd
                            
 game_lives game_lives_unit(.clk(clk), .reset(reset), .x(x), .y(y), .bm_hb_on(bm_hb_on),
                            .enemy_on(enemy_on), .exp_on(exp_on), .gameover(gameover),
-                           .background_rgb(background_rgb), .lives_next(lives));
+                           .background_rgb(background_rgb));
 
 
 
@@ -170,9 +149,8 @@ assign rgb_next = pixel_tick?
                   12'b001000100000 : rgb_reg;
 
 // assign rgb output of top module
- assign rgb = (display_on) ? rgb_reg : 8'h00;
-
-
+assign rgb = (display_on) ? rgb_reg : 8'h00;
+                
 // instantiate vga synchronization circuit 
 vga_sync vga_sync_unit (.clk(clk), .reset(reset), .hsync(hsync), .vsync(vsync), .display_on(display_on), .p_tick(pixel_tick), .x(x), .y(y));
 

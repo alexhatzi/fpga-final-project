@@ -1,6 +1,6 @@
 -------------------------------------
 | Tool Version : Vivado v.2024.1
-| Date         : Fri Nov 22 17:55:05 2024
+| Date         : Tue Nov 26 11:24:24 2024
 | Host         : Samsung-SmartFridge
 | Design       : design_1
 | Device       : xc7a35t-cpg236-1--

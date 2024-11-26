@@ -1,75 +1,50 @@
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="14401" HostCore="16" HostMemory="15704928">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="29264" HostCore="16" HostMemory="15704928">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="71912" HostCore="16" HostMemory="15704928">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="68912" HostCore="16" HostMemory="15704928">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="127296" HostCore="16" HostMemory="15704928">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="108431" HostCore="16" HostMemory="15704928">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="181892" HostCore="16" HostMemory="15704928">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="147931" HostCore="16" HostMemory="15704928">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="236306" HostCore="16" HostMemory="15704928">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="187560" HostCore="16" HostMemory="15704928">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="290480" HostCore="16" HostMemory="15704928">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="225643" HostCore="16" HostMemory="15704928">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="345628" HostCore="16" HostMemory="15704928">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="264659" HostCore="16" HostMemory="15704928">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="398785" HostCore="16" HostMemory="15704928">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="303646" HostCore="16" HostMemory="15704928">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="453984" HostCore="16" HostMemory="15704928">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="342580" HostCore="16" HostMemory="15704928">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="507848" HostCore="16" HostMemory="15704928">
-    </Process>
-</ProcessHandle>
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="563725" HostCore="16" HostMemory="15704928">
-    </Process>
-</ProcessHandle>
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="564348" HostCore="16" HostMemory="15704928">
-    </Process>
-</ProcessHandle>
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="617155" HostCore="16" HostMemory="15704928">
-    </Process>
-</ProcessHandle>
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="670033" HostCore="16" HostMemory="15704928">
-    </Process>
-</ProcessHandle>
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="724364" HostCore="16" HostMemory="15704928">
+    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="381216" HostCore="16" HostMemory="15704928">
     </Process>
 </ProcessHandle>
