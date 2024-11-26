@@ -37,7 +37,6 @@
     logic        vga_clk    ; 
     logic [9:0]  y_c, x_c   ; 
 
-    assign p_tick = vga_clk ; 
 
 
     clk_divider #( .CLK_COUNT(2)) u_clk_divider // 25 Mhz for VGA standard
@@ -84,68 +83,69 @@
     end
 
 
-
-// HSYNC 
-   always @(posedge vga_clk) begin
-    if (vsync) begin
-
-        case (HSYNC_STATE)
-            HIDLE : begin
-                    HSYNC_STATE <= HWAIT ; 
-                    h_counter   <= 0     ; 
-            end
-            HWAIT : begin
-                if (h_counter == B_CLKS - 1) begin  
-                    HSYNC_STATE <= HSYNC ; 
-                    hsync       <= 1'b1  ;  
-                    h_counter   <= '0    ;
-                    y_c           <= y_c + 1 ; 
-                end else
-                    h_counter <= h_counter + 1 ;
-            end
-            HSYNC : begin
-                if (h_counter == C_CLKS + D_CLKS + E_CLKS - 1) begin  // End of visible region and porches
+    //HSYNC 
+    always @(posedge vga_clk or posedge reset) begin
+        if (reset) begin
+            HSYNC_STATE <= HIDLE;
+            hsync <= 0;
+            h_counter <= 0;
+            x_c <= 0;
+        end else if (vsync) begin
+            case (HSYNC_STATE)
+                HIDLE: begin
                     HSYNC_STATE <= HWAIT;
-                    hsync <= 1'b0  ;  
-                    h_counter <= 0 ;
-                    x_c <= '0 ; 
-                end else begin
-                    x_c         <= x_c + 1    ; 
-                    h_counter <= h_counter + 1;
+                    h_counter <= 0;
                 end
-            end
-          default : begin 
-                    HSYNC_STATE <= HIDLE ;
-                    h_counter   <= '0    ; 
-          end 
-        endcase
-    end else begin
-       y_c <= '0 ;
-       x_c <= '0 ;  
-       hsync <= '0 ; 
+                HWAIT: begin
+                    if (h_counter == B_CLKS - 1) begin
+                        HSYNC_STATE <= HSYNC;
+                        hsync <= 1;
+                        h_counter <= 0;
+                        y_c <= y_c + 1;
+                    end else begin
+                        h_counter <= h_counter + 1;
+                    end
+                end
+                HSYNC: begin
+                    if (h_counter == C_CLKS + D_CLKS + E_CLKS - 1) begin
+                        HSYNC_STATE <= HWAIT;
+                        hsync <= 0;
+                        h_counter <= 0;
+                        x_c <= 0;
+                    end else begin
+                        h_counter <= h_counter + 1;
+                        x_c <= x_c + 1;
+                    end
+                end
+                default: begin
+                    HSYNC_STATE <= HIDLE;
+                end
+            endcase
+        end else begin
+            hsync <= 0;
+            x_c <= 0;
+            y_c <= 0;
+        end
+    end
 
-    end
-    end
 
     always @(posedge vga_clk) begin
         if (vsync) begin
         if ( (y_c >= 10) && (x_c >= 56))  begin
             y <= y_c - 20 ; 
             x <= x_c - 60 ; 
-            display_on <= 1 ; 
         end   
         end     
         else begin
             x <= '0 ; 
             y <= '0 ; 
-            display_on <= '0 ; 
         end
-
-
-
-        
     end
 
+    assign display_on = (x_c >= 56 && x_c < 56 + D_CLKS) && 
+                        (y_c >= 10 && y_c < 10 + R_CLKS);
 
+
+    assign p_tick = vga_clk ;
 
 endmodule 
