@@ -1,2 +1,0 @@
-explosions_br.v,verilog,xil_defaultlib,../../../../bomberman_basys3.gen/sources_1/ip/explosions_br/sim/explosions_br.v,
-glbl.v,Verilog,xil_defaultlib,glbl.v

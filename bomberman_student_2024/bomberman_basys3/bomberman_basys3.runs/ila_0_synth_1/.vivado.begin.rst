@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado" Owner="alex" Host="Samsung-SmartFridge" Pid="822213" HostCore="16" HostMemory="15704924">
-    </Process>
-</ProcessHandle>

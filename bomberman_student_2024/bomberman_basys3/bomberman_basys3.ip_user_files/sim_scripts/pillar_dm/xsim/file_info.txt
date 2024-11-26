@@ -1,2 +1,0 @@
-pillar_dm.v,verilog,xil_defaultlib,../../../../bomberman_basys3.gen/sources_1/ip/pillar_dm/sim/pillar_dm.v,
-glbl.v,Verilog,xil_defaultlib,glbl.v

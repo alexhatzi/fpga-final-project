@@ -1,7 +1,0 @@
-verilog xil_defaultlib  \
-"../../../../bomberman_basys3.gen/sources_1/ip/player_death_br/sim/player_death_br.v" \
-
-verilog xil_defaultlib "glbl.v"
-
-# Do not sort compile order
-nosort

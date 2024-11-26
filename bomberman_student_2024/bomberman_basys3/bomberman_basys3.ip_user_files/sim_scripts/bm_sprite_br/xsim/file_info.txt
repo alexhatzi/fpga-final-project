@@ -1,2 +1,0 @@
-bm_sprite_br.v,verilog,xil_defaultlib,../../../../bomberman_basys3.gen/sources_1/ip/bm_sprite_br/sim/bm_sprite_br.v,
-glbl.v,Verilog,xil_defaultlib,glbl.v
