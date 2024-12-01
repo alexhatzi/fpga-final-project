@@ -4,7 +4,8 @@ module game_lives
    input wire [9:0] x, y,                 // current pixel location on screen
    input wire bm_hb_on, enemy_on, exp_on, // input to determine when bomberman's hitbox overlaps enemy or explosion
    output wire gameover,                  // output asserted when lives == 0 and game is over, used to turn off bomberman moving and bomb
-	output wire [11:0] background_rgb      // output for background frame to arena color, going from red to black indicating bomberman's lives
+   output wire [11:0] background_rgb,      // output for background frame to arena color, going from red to black indicating bomberman's lives
+   output wire [2:0] lives 
 );
 
 localparam INVISIBILITY_MAX = 150000000;  // max value for invisibility counter
@@ -50,4 +51,6 @@ assign background_rgb = lives_reg == 5 ? 12'b101000000000 :
 						lives_reg == 2 ? 12'b010000000000 : 
 						lives_reg == 1 ? 12'b001000000000 : 12'd0;
 						  
+assign lives = lives_reg ; 
+
 endmodule

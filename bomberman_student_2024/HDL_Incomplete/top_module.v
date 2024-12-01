@@ -62,7 +62,7 @@ wire [9:0] block_w_addr;
 wire gameover;
 wire enemy_hit;
 wire post_exp_active;
-
+wire [2:0] lives ; 
 // x/y pixel coordinates translated to arena coordinates
 wire [9:0] x_a, y_a;
 assign x_a = x - X_WALL_L;
@@ -89,44 +89,139 @@ assign wall_on = ((x < LEFT_WALL) | ( x > RIGHT_WALL) | (y < TOP_WALL) | (y > BO
 
 // instantiate block module
 
-pillar_display pillar_disp_unit(.x(x), .y(y), .x_a(x_a), .y_a(y_a), .pillar_on(pillar_on), .rgb_out(pillar_rgb));
-
+   pillar_display pillar_disp_unit
+                                 ( .x          (x         )
+                                 , .y          (y         )
+                                 , .x_a        (x_a       )
+                                 , .y_a        (y_a       )
+                                 , .pillar_on  (pillar_on )
+                                 , .rgb_out    (pillar_rgb)
+                                 );
                         
-bomberman_module bm_module(.clk(clk), .reset(reset), .x(x), .y(y), .L(L), .R(R), .U(U), .D(D), .cd(current_dir_reg), .bm_blocked(bm_blocked),
-                           .gameover(gameover), .bomberman_on(bomberman_on), .bm_hb_on(bm_hb_on),
-                           .x_b(x_b), .y_b(y_b), .rgb_out(bomberman_rgb));
+   bomberman_module bm_module
+                                 ( .clk            (clk)
+                                 , .reset          (reset)
+                                 , .x              (x    )
+                                 , .y              (y    )
+                                 , .L              (L    )
+                                 , .R              (R    )
+                                 , .U              (U    )
+                                 , .D              (D    )
+                                 , .cd             (current_dir_reg)
+                                 , .bm_blocked     (bm_blocked   )
+                                 , .gameover       (gameover     )
+                                 , .bomberman_on   (bomberman_on )
+                                 , .bm_hb_on       (bm_hb_on     )
+                                 , .x_b            (x_b          )
+                                 , .y_b            (y_b          )
+                                 , .rgb_out        (bomberman_rgb)
+                                 , .lives          (lives        )
+                                 );
 
-
-
-block_module block_module_unit(.clk(clk), .reset(reset), .display_on(display_on),
-                               .x(x), .y(y), .x_a(x_a), .y_a(y_a), .cd(current_dir_reg), .x_b(x_b),
-                               .y_b(y_b), .waddr(block_w_addr), .we(block_we),
-                               .rgb_out(block_rgb), .block_on(block_on), .bm_blocked(bm_blocked));
+   block_module block_module_unit(.clk(clk)
+                                 , .reset(reset)
+                                 , .display_on(display_on)
+                                 ,.x(x)
+                                 , .y(y)
+                                 , .x_a(x_a)
+                                 , .y_a(y_a)
+                                 , .cd(current_dir_reg)
+                                 , .x_b(x_b)
+                                 , .y_b(y_b)
+                                 , .waddr(block_w_addr)
+                                 , .we(block_we)
+                                 , .rgb_out(block_rgb)
+                                 , .block_on(block_on)
+                                 , .bm_blocked(bm_blocked)
+                                 , .exp_on(exp_on)
+                                 );
      
+   bomb_module bomb_module_unit
+                                 ( .clk         (clk)
+                                 , .reset       (reset)
+                                 , .x_a         (x_a)
+                                 , .y_a         (y_a)
+                                 , .cd          (current_dir_reg)
+                                 , .x_b         (x_b)
+                                 , .y_b         (y_b)
+                                 , .A           (A)
+                                 , .gameover    (gameover)
+                                 , .bomb_rgb    (bomb_rgb)
+                                 , .exp_rgb     (exp_rgb)
+                                 , .bomb_on     (bomb_on)
+                                 , .exp_on      (exp_on)
+                                 , .block_w_addr(block_w_addr)
+                                 , .block_we    (block_we)
+                                 , .post_exp_active(post_exp_active)
+                                 );
+        
+   enemy_module enemy_module_unit
+                                 ( .clk               (clk)
+                                 , .reset             (reset)
+                                 , .display_on        (display_on)
+                                 , .x                 (x)
+                                 , .y                 (y)
+                                 , .x_b               (x_b)
+                                 , .y_b               (y_b)
+                                 , .exp_on            (exp_on)
+                                 , .post_exp_active   (post_exp_active)
+                                 , .rgb_out           (enemy_rgb)
+                                 , .enemy_on          (enemy_on)
+                                 , .enemy_hit         (enemy_hit)
+                                 );      
+              
+   game_lives game_lives_unit
+                                 ( .clk(clk)
+                                 , .reset(reset)
+                                 , .x(x)
+                                 , .y(y)
+                                 , .bm_hb_on(bm_hb_on)
+                                 , .enemy_on(enemy_on)
+                                 , .exp_on(exp_on)
+                                 , .gameover(gameover)
+                                 , .background_rgb(background_rgb)
+                                 , .lives(lives)
+                                 );
+
+   score_display score_display_unit
+                                 ( .clk(clk)
+                                 , .reset(reset)
+                                 , .x(x)
+                                 , .y(y)
+                                 , .enemy_hit(enemy_hit)
+                                 , .score_on(score_on)
+                                 );
+   // instantiate vga synchronization circuit 
+   vga_sync       vga_sync_unit 
+                                 ( .clk(clk)
+                                 , .reset(0)
+                                 , .hsync(hsync)
+                                 , .vsync(vsync)
+                                 , .display_on(display_on)
+                                 , .p_tick(pixel_tick)
+                                 , .x(x)
+                                 , .y(y)
+                                 );
+
+   ila_0             ILA_UNIT 
+                                 ( 
+                                 .clk        (clk              ), // input wire clk
+                                 .probe0     (block_on         ), // input wire [0:0]  probe0  
+                                 .probe1     (exp_on           ), // input wire [0:0]  probe1 
+                                 .probe2     (bm_module.newhit ), // input wire [0:0]  probe2 
+                                 .probe3     (bm_module.p_c_down), // input wire [0:0]  probe3
+                                 .probe4     (bm_module.p_c_up ), // input wire [0:0]  probe3
+                                 .probe5     (bomb_module_unit.bomb_exp_state_reg      ),
+                                 .probe6     (block_module_unit.dest_timer             ),
+                                 .probe7     (post_exp_active                          ),
+                                 .probe8     (score_display_unit.enemy_hit_posedge     ),
+                                 .probe9     (score_display_unit.bcd3),
+                                 .probe10    (score_display_unit.bcd2),
+                                 .probe11    (score_display_unit.bcd1),
+                                 .probe12    (score_display_unit.bcd0)
+                                 );
 
 
-bomb_module bomb_module_unit(.clk(clk), .reset(reset), .x_a(x_a), .y_a(y_a), .cd(current_dir_reg), 
-                               .x_b(x_b), .y_b(y_b), .A(A), .gameover(gameover), .bomb_rgb(bomb_rgb),
-                               .exp_rgb(exp_rgb), .bomb_on(bomb_on), .exp_on(exp_on), .block_w_addr(block_w_addr), 
-                               .block_we(block_we), .post_exp_active(post_exp_active));
-
-
-                         
-enemy_module enemy_module_unit(.clk(clk), .reset(reset), .display_on(display_on),
-                               .x(x), .y(y), .x_b(x_b), .y_b(y_b),
-                               .exp_on(exp_on), .post_exp_active(post_exp_active), .rgb_out(enemy_rgb),
-                               .enemy_on(enemy_on), .enemy_hit(enemy_hit));      
-
-
-
-                           
-game_lives game_lives_unit(.clk(clk), .reset(reset), .x(x), .y(y), .bm_hb_on(bm_hb_on),
-                           .enemy_on(enemy_on), .exp_on(exp_on), .gameover(gameover),
-                           .background_rgb(background_rgb));
-
-
-
-score_display score_display_unit(.clk(clk), .reset(reset), .x(x), .y(y), .enemy_hit(enemy_hit), .score_on(score_on));
 
 
 // infer register for RGB color data signal
@@ -151,7 +246,5 @@ assign rgb_next = pixel_tick?
 // assign rgb output of top module
 assign rgb = (display_on) ? rgb_reg : 8'h00;
                 
-// instantiate vga synchronization circuit 
-vga_sync vga_sync_unit (.clk(clk), .reset(reset), .hsync(hsync), .vsync(vsync), .display_on(display_on), .p_tick(pixel_tick), .x(x), .y(y));
 
 endmodule

@@ -33,7 +33,8 @@ localparam [3:0] no_bomb  = 3'b000,  // no bomb on screen
                  exp_2    = 3'b011,  // 2
                  exp_3    = 3'b100,  // 3
                  exp_4    = 3'b101,  // 4
-                 post_exp = 3'b110;  // wait for .75 s to finish
+                 post_exp = 3'b110,  // wait for .75 s to finish
+                 waitt     = 3'b111;
                  
 /*  
 The labeling for explosion tiles "e_x" relative to the bomb "b" is shown below
@@ -120,24 +121,32 @@ always @ (posedge clk)  begin
    case (bomb_exp_state_next)
 
       no_bomb  :   begin
+                    post_exp_active <= 1'b0 ; 
                     if (A && !gameover) begin
                        bomb_active_next    <= 1'b1       ;
                        bomb_x_next         <= x_bomb_a[9:4] ;
                        bomb_y_next         <= y_bomb_a[9:4] ;
                        bomb_exp_state_next <= bomb     ; 
+                       exp_block_addr_next <= bomb_x_next - 1'b1 + bomb_y_next*33 ; 
                     end
                    end 
       bomb     :   begin
                     if ( bomb_counter_reg == BOMB_COUNTER_MAX) begin
-                       bomb_active_next    <= 1'b0    ; 
-                       exp_active_next     <= 1'b1    ; 
-                       block_we_next       <= 1'b1    ; 
-                       bomb_exp_state_next <= exp_1 ; 
+                       bomb_active_next     <= 1'b0    ; 
+                       exp_active_next      <= 1'b1    ; 
+                     bomb_exp_state_next    <= waitt   ; 
                     end
+                   end
+      waitt    :  begin
+               if ( exp_counter_reg == EXP_COUNTER_MAX) begin
+                              block_we_next       <= 1'b1  ;
+                              bomb_exp_state_next <= exp_1 ;
+               end else  exp_active_next     <= 1'b1    ; 
                    end
       exp_1    :   begin
                     exp_block_addr_next <= bomb_x_next - 1'b1 + bomb_y_next*33 ; 
                     bomb_exp_state_next <= exp_2                               ; 
+
                    end 
       exp_2    :   begin
                     exp_block_addr_next <= bomb_x_next + 1'b1 + bomb_y_next*33 ; 
@@ -150,14 +159,16 @@ always @ (posedge clk)  begin
       exp_4    :   begin
                     exp_block_addr_next <= bomb_x_next + (bomb_y_next+1)*33    ; 
                     bomb_exp_state_next <= post_exp                            ;
+
                    end
       post_exp :   begin
                     post_exp_active <= 1'b1 ; 
                     if ( exp_counter_next == EXP_COUNTER_MAX) begin
-                    bomb_exp_state_next <= no_bomb ;
                     exp_active_next     <= 1'b0    ; 
+                    bomb_exp_state_next <= no_bomb ;
                     block_we_next       <= 1'b0    ; 
-                    end
+                    end  ; 
+
                    end
       default  :   begin
                    bomb_exp_state_next <= no_bomb ; 

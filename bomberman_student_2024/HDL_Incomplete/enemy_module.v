@@ -204,13 +204,13 @@ always @*
                      end
 
       check_dir   :  begin
-                     if ((e_cd_reg == CD_U)           && (y_e_abm > 0 ) &&  !(x_e_abm[0])) begin
+                     if ((e_cd_reg == CD_U)           && (y_e_abm <= 26  ) &&     !(x_e_abm[0])) begin
                         e_state_next <= move_btwn_tiles ; 
-                     end else if ((e_cd_reg == CD_D)  && (y_e_abm < 26   ) &&  !(x_e_abm[0])) begin
+                     end else if ((e_cd_reg == CD_D)  && (y_e_abm >= 0   ) &&     !(x_e_abm[0])) begin
                         e_state_next <= move_btwn_tiles ;
-                     end else if ((e_cd_reg == CD_L)  && (x_e_abm > 0   ) &&   (y_e_abm[0])) begin
+                     end else if ((e_cd_reg == CD_L)  && (x_e_abm >= 0   ) &&      (y_e_abm[0])) begin
                         e_state_next <= move_btwn_tiles ; 
-                     end else if ((e_cd_reg == CD_R)  && (x_e_abm < 32  ) &&   (y_e_abm[0])) begin
+                     end else if ((e_cd_reg == CD_R)  && (x_e_abm <= 32  ) &&      (y_e_abm[0])) begin
                         e_state_next <= move_btwn_tiles ; 
                      end else begin
                         e_state_next <= get_rand_dir    ; 

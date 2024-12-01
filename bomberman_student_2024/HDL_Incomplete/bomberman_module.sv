@@ -70,7 +70,7 @@ reg  [9:0] x_b_reg,  y_b_reg;
 wire [9:0] x_b_next, y_b_next;
 
 // register to count time between walking frames
-reg  [25:0] frame_timer_reg;
+reg  [25:0] frame_timer_reg,hit_timer_reg;
 wire [25:0] frame_timer_next;
 reg  [4:0]  speed_up ; 
 
@@ -80,7 +80,7 @@ reg  [8:0] rom_offset_next;
 
 reg [2:0] lives_d ; 
 reg newhit ; 
-reg [8:0] lives_offset_reg ; 
+reg [11:0] lives_offset_reg ; 
 
 wire [11:0] lives_rgb, rgb ;
 
@@ -210,14 +210,31 @@ end
 
 
 always @ ( posedge clk) begin
-   if (lives && !lives_d) begin
+   if (reset) begin
+      lives_offset_reg <= '0 ; 
+      newhit           <= '0 ; 
+      hit_timer_reg    <= '0 ; 
+   end else begin
+   if ((lives != lives_d) && (lives != 5)) begin
       newhit <= '1 ; 
    end else begin
-      if (frame_timer_reg == FRAME_REG_MAX) begin
-         newhit <= '0 ; 
-      end
+   if (newhit) begin
+   lives_offset_reg  <=  (lives == 4) ? 0    : 
+                         (lives == 3) ? 384  : 
+                         (lives == 2) ? 768  : 
+                         (lives == 1) ? 1152 : 
+                                        1536 ;
+                                        
+   if (hit_timer_reg == FRAME_REG_MAX) begin
+      newhit           <= '0 ; 
+      hit_timer_reg    <= '0 ; 
+      end else hit_timer_reg <= hit_timer_reg + 1 ; 
+      end 
+   end
    end
 end
+
+
 
 
 //********************************************************* REGISTER TO INDEX INTO SPRITE ROM *****************************************************
@@ -228,8 +245,6 @@ always @ ( posedge clk ) begin
    end else begin
       case (frame_timer_reg)
       FRAME_CNT_1 : begin
-                    if (newhit) 
-                    lives_offset_reg <= lives * 384 ; 
                     if (U)
                     rom_offset_reg <= U_1 ; 
                     else if ( D ) 
@@ -276,8 +291,7 @@ end
 wire [11:0] br_addr = (cd == CD_L) ? 15 - (x - x_b_reg) + {(y-y_b_reg+rom_offset_reg), 4'd0} 
                                    :      (x - x_b_reg) + {(y-y_b_reg+rom_offset_reg), 4'd0};
 
-wire [11:0] hit_addr = (cd == CD_L) ? 15 - (x - x_b_reg) + {(y-y_b_reg+lives_offset_reg), 4'd0} 
-                                   :       (x - x_b_reg) + {(y-y_b_reg+lives_offset_reg), 4'd0};
+wire [11:0] hit_addr = (x - x_b_reg) + {(y-y_b_reg), 4'd0} + lives_offset_reg ; 
 
 
 // instantiate bomberman sprite ROM
@@ -295,7 +309,7 @@ assign bomberman_on = (x >= x_b_reg) & (x <= x_b_reg + BM_WIDTH - 1) & (y >= y_b
 assign bm_hb_on = (x >= x_b_reg) & (x <= x_b_reg + BM_WIDTH - 1) & 
                   (y >= y_b_reg + BM_HB_OFFSET_9) & (y <= y_b_reg + BM_HEIGHT - 1);
 
-assign rgb_out = newhit ? lives_rgb : rgb ; 
+assign rgb_out = (newhit || (lives == 0 )) ? lives_rgb : rgb ; 
 
 
 endmodule

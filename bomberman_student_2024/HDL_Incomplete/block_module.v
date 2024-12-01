@@ -9,6 +9,7 @@ module block_module
    input wire [9:0] x_b, y_b,           // bomberman coordinates
    input wire [9:0] waddr,              // write address (a) into block map RAM
    input wire we,                       // write enable to block map RAM
+   input wire exp_on,
    output wire [11:0] rgb_out,          // output block rgb
    output wire block_on,                // asserted when x/y within block location on screen
    output wire bm_blocked               // asserted when bomberman is blocked by a block at current location and direction
@@ -37,6 +38,24 @@ localparam CD_L = 2'b11;
 wire data_in = 1'b0; // data input (d)
 reg [9:0] raddr;     // read address (dpra)          // write enable (we)
 wire data_out;       // data output (dpo)
+
+
+wire [11:0] dest_out, blk_out ;
+reg [3:0] block_dest_state  ;
+reg [11:0] dest_animation_addr ; 
+reg [26:0] dest_timer ; 
+localparam DETS_MAX =  25'd25000000; 
+
+localparam WAIT      = 3'b000 ,
+           START     = 3'b001 ,
+           FINISH    = 3'b010 ,
+           STG1      = 3'b011 ,
+           STG2      = 3'b100 , 
+           STG3      = 3'b101 , 
+           STG4      = 3'b110 , 
+           STG5      = 3'b111 ;
+             
+
 
 // signals used to index into block_map RAM to determine if bomberman will collide with a box 
 // if moving in a specific direction at the current location. format: <coordinate>_b_hit_<left, right, bottom, top>
@@ -72,10 +91,68 @@ always @(posedge clk)
    else 
       raddr = 896; // don't care index in RAM
    end
-   
+
+
+   always @ ( posedge clk ) begin
+      case (block_dest_state)
+      WAIT : begin
+               if (block_on & exp_on ) 
+               block_dest_state <= START ; 
+              end
+      START : begin
+               dest_animation_addr <= (x_a[3:0]) + {(y_a[3:0]), 4'd0} ; 
+                  if (dest_timer == DETS_MAX ) begin
+                     dest_timer <= 0 ; 
+                     block_dest_state <= STG1 ; 
+                  end else dest_timer <= dest_timer + 1 ; 
+              end      
+      STG1 : begin
+               dest_animation_addr <= (x_a[3:0]) + {(y_a[3:0]), 4'd0} + 256  ; 
+                  if (dest_timer == DETS_MAX ) begin
+                     dest_timer <= 0 ; 
+                     block_dest_state <= STG2 ; 
+                  end else dest_timer <= dest_timer + 1 ; 
+              end      
+      STG2 : begin
+               dest_animation_addr <= (x_a[3:0]) + {(y_a[3:0]), 4'd0} + 512 ; 
+                  if (dest_timer == DETS_MAX ) begin
+                     dest_timer <= 0 ; 
+                     block_dest_state <= STG3 ; 
+                  end else dest_timer <= dest_timer + 1 ; 
+              end      
+      STG3 : begin
+               dest_animation_addr <= (x_a[3:0]) + {(y_a[3:0]), 4'd0} +  768 ; 
+                  if (dest_timer == DETS_MAX ) begin
+                     dest_timer <= 0 ; 
+                     block_dest_state <= STG4 ; 
+                  end else dest_timer <= dest_timer + 1 ; 
+              end      
+      STG4 : begin
+               dest_animation_addr <= (x_a[3:0]) + {(y_a[3:0]), 4'd0} + 1024 ; 
+                  if (dest_timer == DETS_MAX ) begin
+                     dest_timer <= 0 ; 
+                     block_dest_state <= STG5 ; 
+                  end else dest_timer <= dest_timer + 1 ; 
+              end      
+      STG5 : begin
+               dest_animation_addr <= (x_a[3:0]) + {(y_a[3:0]), 4'd0} + 1280 ; 
+                  if (dest_timer == DETS_MAX ) begin
+                     dest_timer <= 0 ; 
+                     block_dest_state <= FINISH ; 
+                  end else dest_timer <= dest_timer + 1 ; 
+              end      
+      FINISH : begin
+                 block_dest_state <= WAIT  ;
+              end      
+
+      endcase
+   end
+
+
 // instantiate block sprite ROM
 // index into ROM uses x/y pixel arena coordinates lower 4 bits, as each block is 16x16
-block_dm block_unit(.a((x_a[3:0]) + {(y_a[3:0]), 4'd0}), .spo(rgb_out));
+block_dm block_unit(.a((x_a[3:0]) + {(y_a[3:0]), 4'd0}), .spo(blk_out));
+block_dest_rom block_dest_unit (.a(dest_animation_addr), .spo(dest_out)) ; 
 
 // instantiate block_map distributed dual port RAM
 block_map block_map_unit(.a(waddr), .d(data_in), .dpra(raddr), .clk(clk), .we(we), .spo(), .dpo(data_out));
@@ -90,6 +167,8 @@ always @(posedge clk, posedge reset)
    else 
       blocked_reg <= blocked_next;
       
+assign rgb_out   = (exp_on & block_on) ? dest_out : blk_out ; 
+
 // check output of block_map when !display_on and raddr is looking for a block in bomberman's path
 assign blocked_next = (!display_on & data_out == 1) ? 1 : 
                       (!display_on & data_out == 0) ? 0 : blocked_reg;

@@ -15,7 +15,6 @@ conversion_state_t CONVERSION_STATE ;
 
 logic [3:0] bcd3_n,bcd2_n,bcd1_n,bcd0_n ;  
 
-logic [3:0] i ; 
 logic [13:0] data ; 
 
 assign bcd3 = bcd3_n ; 
@@ -33,24 +32,15 @@ always @ ( posedge clk ) begin
     end else begin
 
     case (CONVERSION_STATE)
-
     IDLE  : begin
             if (start) 
-            CONVERSION_STATE <= START ; 
-           end
-
-    START : if (i == 14) begin
             CONVERSION_STATE <= PRC1 ; 
-            i <= '0 ; 
-            end else begin 
-            data <= data + (in[i] << i ) ; 
-            i    <= i + 1 ; 
-            end
+           end
     PRC1  : begin
-            bcd0_n <= data % 10 ; 
-            bcd1_n <= data % 100 ; 
-            bcd2_n <= data % 1000 ; 
-            bcd3_n <= data % 10000 ; 
+            bcd0_n <= in % 10        ; 
+            bcd1_n <= in % 100       ;  
+            bcd2_n <= in % 1000      ;  
+            bcd3_n <= in % 10000     ; 
             CONVERSION_STATE <= IDLE ;
             end
     endcase    
